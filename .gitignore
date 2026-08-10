@@ -1,0 +1,49 @@
+# Build output
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Devbox generated virtenv (devbox.json / devbox.lock ARE committed)
+.devbox/
+
+# Local development secrets — NEVER commit. Local signing keys live here.
+/.local-keys/
+*.pem
+*.p8
+*.key
+
+# dotenv-style local overrides (Spring does not load these natively —
+# use env vars, direnv/Devbox, or a secret mount instead). Keep examples only.
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# IntelliJ IDEA module output (repo root only — do not use a bare `out/`
+# pattern, which would also ignore hexagonal `adapter/out/` packages).
+.idea/
+*.iml
+*.ipr
+*.iws
+/out/
+/out.txt
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+
+# VS Code
+.vscode/
+
+# Cursor IDE local project state — not shared across clones
+.cursor/
