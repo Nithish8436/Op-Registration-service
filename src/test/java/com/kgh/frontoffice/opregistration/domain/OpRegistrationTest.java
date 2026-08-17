@@ -10,40 +10,39 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class OpRegistrationTest {
 
     @Test
-    void rejectsMissingPatientIdentity() {
+    void rejectsMissingPatient() {
         ContactInfo contactInfo = ContactInfo.of("9383848291", "a@b.com");
-        Demographics demographics = Demographics.of(Gender.MALE, LocalDate.of(1990, 1, 1), "Single");
+        Demographics demographics = Demographics.of(Gender.MALE, null, LocalDate.of(1990, 1, 1), MaritalStatus.SINGLE);
         assertThatThrownBy(() -> OpRegistration.of(null, contactInfo, demographics))
                 .isInstanceOf(InvalidOpRegistrationException.class);
     }
 
     @Test
     void rejectsMissingContactInfo() {
-        PatientIdentity patientIdentity = PatientIdentity.of("Mr", "Ram");
-        Demographics demographics = Demographics.of(Gender.MALE, LocalDate.of(1990, 1, 1), "Single");
-        assertThatThrownBy(() -> OpRegistration.of(patientIdentity, null, demographics))
+        Patient patient = Patient.of("Mr", "Ram");
+        Demographics demographics = Demographics.of(Gender.MALE, null, LocalDate.of(1990, 1, 1), MaritalStatus.SINGLE);
+        assertThatThrownBy(() -> OpRegistration.of(patient, null, demographics))
                 .isInstanceOf(InvalidOpRegistrationException.class);
     }
 
     @Test
-    void rejectsMissingDemographics(){
-        PatientIdentity patientIdentity = PatientIdentity.of("Mr", "Ram");
+    void rejectsMissingDemographics() {
+        Patient patient = Patient.of("Mr", "Ram");
         ContactInfo contactInfo = ContactInfo.of("9383848291", "a@b.com");
-        assertThatThrownBy(() -> OpRegistration.of(patientIdentity, contactInfo, null))
+        assertThatThrownBy(() -> OpRegistration.of(patient, contactInfo, null))
                 .isInstanceOf(InvalidOpRegistrationException.class);
     }
 
     @Test
-    void createOpRegistrationWhenAllPartsPresent(){
-        PatientIdentity patientIdentity = PatientIdentity.of("Mr", "Ram");
+    void createOpRegistrationWhenAllPartsPresent() {
+        Patient patient = Patient.of("Mr", "Ram");
         ContactInfo contactInfo = ContactInfo.of("9383848291", "a@b.com");
-        Demographics demographics = Demographics.of(Gender.MALE, LocalDate.of(1990, 1, 1), "Single");
+        Demographics demographics = Demographics.of(Gender.MALE, null, LocalDate.of(1990, 1, 1), MaritalStatus.SINGLE);
 
-        OpRegistration opRegistration=OpRegistration.of(patientIdentity, contactInfo, demographics);
+        OpRegistration opRegistration = OpRegistration.of(patient, contactInfo, demographics);
 
-        assertThat(opRegistration.patientIdentity().equals(patientIdentity));
-        assertThat(opRegistration.contactInfo().equals(contactInfo));
-        assertThat(opRegistration.demographics().equals(demographics));
-
+        assertThat(opRegistration.patient()).isEqualTo(patient);
+        assertThat(opRegistration.contactInfo()).isEqualTo(contactInfo);
+        assertThat(opRegistration.demographics()).isEqualTo(demographics);
     }
 }

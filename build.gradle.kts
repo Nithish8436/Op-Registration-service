@@ -1,5 +1,7 @@
 plugins {
     java
+    id("org.springframework.boot") version "3.3.4"
+    id("io.spring.dependency-management") version "1.1.6"
 }
 
 group = "com.kgh"
@@ -19,8 +21,12 @@ repositories {
 }
 
 dependencies {
-    // Deliberately just enough to unit-test the domain core in isolation: no Spring, no
-    // JPA, no Kafka. Those arrive later, only when we build the adapters that need them.
+    // Phase 3: Spring + JPA, added now that we're building the real persistence adapter.
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("org.postgresql:postgresql")
+
+    // Kept from the domain/use-case phases: no web/HTTP dependency yet, that arrives
+    // with the driving adapter (Phase 6).
     testImplementation(platform("org.junit:junit-bom:5.11.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:3.26.3")
@@ -30,4 +36,43 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+// Phase 4: integrationTest exercises real infrastructure adapters (PostgreSQL via
+// Testcontainers). It requires a running Docker daemon and is intentionally NOT wired
+// into `check` — run it explicitly with `./gradlew integrationTest`.
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+        }
+
+        register<JvmTestSuite>("integrationTest") {
+            useJUnitJupiter()
+            dependencies {
+                implementation(project())
+                implementation("org.springframework.boot:spring-boot-starter-test")
+                implementation("org.springframework.boot:spring-boot-testcontainers")
+                // Pinned explicitly (not left to Spring Boot's managed version) — Docker
+                // Engine 29 raised its minimum API version, and Testcontainers versions
+                // before 2.x ship an internal client too old to speak it. 2.x also
+                // renamed these artifacts with a "testcontainers-" prefix.
+                //
+                // The core module is pinned too: spring-boot-testcontainers otherwise
+                // drags in testcontainers:1.19.8 via Spring's managed BOM, and Gradle's
+                // conflict resolution silently downgrades everything back to it.
+                implementation("org.testcontainers:testcontainers:2.0.5")
+                implementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
+                implementation("org.testcontainers:testcontainers-postgresql:2.0.5")
+                runtimeOnly("org.postgresql:postgresql")
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
 }

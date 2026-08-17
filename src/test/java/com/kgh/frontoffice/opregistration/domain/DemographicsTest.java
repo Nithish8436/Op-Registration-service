@@ -11,27 +11,34 @@ public class DemographicsTest {
 
     @Test
     void rejectsMissingGender() {
-        assertThatThrownBy(() -> Demographics.of(null, LocalDate.of(1990, 1, 1), "Single"))
+        assertThatThrownBy(() -> Demographics.of(null,null, LocalDate.of(1990, 1, 1), MaritalStatus.SINGLE))
                 .isInstanceOf(InvalidOpRegistrationException.class);
     }
 
     @Test
-    void rejectsMissingDateOfBirth() {
-        assertThatThrownBy(() -> Demographics.of(Gender.MALE, null, "Single"))
+    void rejectsMissingAgeAndDateOfBirth() {
+        assertThatThrownBy(() -> Demographics.of(Gender.MALE, null,null, MaritalStatus.SINGLE))
                 .isInstanceOf(InvalidOpRegistrationException.class);
     }
 
     @Test
     void rejectsMissingMaritalStatus(){
-        assertThatThrownBy(()->Demographics.of(Gender.MALE,LocalDate.of(1990,1,1)," "))
+        assertThatThrownBy(()->Demographics.of(Gender.MALE,null,LocalDate.of(1990,1,1),null))
                 .isInstanceOf(InvalidOpRegistrationException.class);
+    }
+
+    @Test
+    void acceptsAgeAloneWithoutDateOfBirth() {
+        Demographics demographics = Demographics.of(Gender.MALE, 30, null, MaritalStatus.SINGLE);
+
+        assertThat(demographics.age()).isEqualTo(30);
     }
 
 
     @Test
     void allMandatoryDemographicsDetailsPresent(){
-        Demographics demographics=Demographics.of(Gender.MALE,LocalDate.of(1990,1,1),"Single");
-        assertThat(demographics).isEqualTo(new Demographics(Gender.MALE,LocalDate.of(1990,1,1),"Single"));
+        Demographics demographics=Demographics.of(Gender.MALE,null, LocalDate.of(1990,1,1),MaritalStatus.SINGLE);
+        assertThat(demographics).isEqualTo(new Demographics(Gender.MALE,null,LocalDate.of(1990,1,1),MaritalStatus.SINGLE));
     }
 
 

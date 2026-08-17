@@ -1,4 +1,6 @@
 package com.kgh.frontoffice.opregistration.adapter.out.persistence;
 
-public class PatientJpaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PatientJpaRepository extends JpaRepository<PatientEntity, Long> {
 }
