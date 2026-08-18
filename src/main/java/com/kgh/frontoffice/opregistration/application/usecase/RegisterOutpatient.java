@@ -6,13 +6,14 @@ import com.kgh.frontoffice.opregistration.domain.ContactInfo;
 import com.kgh.frontoffice.opregistration.domain.Demographics;
 import com.kgh.frontoffice.opregistration.domain.OpRegistration;
 import com.kgh.frontoffice.opregistration.domain.Patient;
+import org.springframework.stereotype.Component;
 
 public class RegisterOutpatient {
 
-    private final Patients patientRepository;
+    private final Patients patients;
 
-    public RegisterOutpatient(Patients patientRepository) {
-        this.patientRepository = patientRepository;
+    public RegisterOutpatient(Patients patients) {
+        this.patients = patients;
     }
 
     public OpRegistration handle(RegisterOutpatientCommand command) {
@@ -22,6 +23,6 @@ public class RegisterOutpatient {
 
         OpRegistration opRegistration = OpRegistration.of(patient, contactInfo, demographics);
 
-        return patientRepository.save(opRegistration);
+        return patients.save(opRegistration);
     }
 }

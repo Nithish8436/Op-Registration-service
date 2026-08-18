@@ -25,13 +25,20 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
 
-    // Kept from the domain/use-case phases: no web/HTTP dependency yet, that arrives
-    // with the driving adapter (Phase 6).
+    // Phase 6: the driving (HTTP) adapter.
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Kept from the domain/use-case phases.
     testImplementation(platform("org.junit:junit-bom:5.11.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Phase 6: needed for @WebMvcTest + MockMvc, to test the HTTP layer in isolation
+    // (mocked use case, no real database) — a different slice than the integrationTest
+    // suite, which hits a real Postgres.
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.test {
@@ -51,6 +58,10 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                // main's `implementation`-scoped deps aren't visible here just from
+                // depending on project() — Gradle only exposes `api`-scoped ones across
+                // source sets, so JPA needs to be declared again explicitly.
+                implementation("org.springframework.boot:spring-boot-starter-data-jpa")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.springframework.boot:spring-boot-testcontainers")
                 // Pinned explicitly (not left to Spring Boot's managed version) — Docker
